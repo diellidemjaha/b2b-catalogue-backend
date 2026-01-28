@@ -2,51 +2,40 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\DB;
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\OrderController;
-use Illuminate\Support\Facades\DB;
 
 /*
 |--------------------------------------------------------------------------
-| Public routes
+| Public API routes (MVP – no auth)
 |--------------------------------------------------------------------------
 */
 
+// Auth (optional for later use)
 Route::post('/login', [AuthController::class, 'login']);
+Route::post('/logout', [AuthController::class, 'logout']);
 
-/*
-|--------------------------------------------------------------------------
-| Protected routes (Sanctum)
-|--------------------------------------------------------------------------
-*/
-Route::middleware('auth:sanctum')->group(function () {
+// Products
+Route::get('/products', [ProductController::class, 'index']);
+Route::get('/products/{id}', [ProductController::class, 'show']);
+Route::post('/products', [ProductController::class, 'store']);
 
-    // Auth
-    Route::post('/logout', [AuthController::class, 'logout']);
-    Route::get('/user', function (Request $request) {
-        return $request->user();
-    });
+// Clients
+Route::get('/clients', [ClientController::class, 'index']);
+Route::post('/clients', [ClientController::class, 'store']);
+Route::get('/clients/{id}', [ClientController::class, 'show']);
 
-    // Products
-    Route::get('/products', [ProductController::class, 'index']);
-    Route::get('/products/{id}', [ProductController::class, 'show']);
+// Orders
+Route::get('/orders', [OrderController::class, 'index']);
+Route::get('/orders/{id}', [OrderController::class, 'show']);
+Route::post('/orders', [OrderController::class, 'store']);
 
-    // Clients
-    Route::get('/clients', [ClientController::class, 'index']);
-    Route::post('/clients', [ClientController::class, 'store']);
-    Route::get('/clients/{id}', [ClientController::class, 'show']);
-
-    // Orders
-    Route::get('/orders', [OrderController::class, 'index']);
-    Route::get('/orders/{id}', [OrderController::class, 'show']);
-    });
-    
-    Route::post('/orders', [OrderController::class, 'store']);
-
-    Route::get('/health', function () {
+// Health check
+Route::get('/health', function () {
     try {
         DB::connection()->getPdo();
         return response()->json(['status' => 'ok']);
